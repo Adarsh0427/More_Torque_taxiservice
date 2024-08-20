@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model vehicle {
+  veh_id          String   @id @default(cuid())
+  vin         String   @unique
+  manufacturer       String
+  model        String
+  year       Int
+  orgId       String @unique
+  org         orgs @relation(fields: [orgId], references: [id])
+}
+
+model orgs {
+  id          String   @id @default(uuid())
+  name        String    @unique
+  account     String
+  website     String    
+  fuelReimbursementPolicy String
+  SpeedLimit_kms   Int
+  vehicleId  String?
+  vehicle     vehicle? 
+  parentOrg   orgs? @relation("orgsToOrgs", fields: [parentId], references: [id])
+  childrenOrgs orgs[] @relation("orgsToOrgs")
+  parentId    String?
+}
